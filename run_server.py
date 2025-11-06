@@ -112,16 +112,20 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
             super().log_message(format, *args)
 
 
-def start_server(port=8000):
+def start_server(port=None):
     """Start the local HTTP server."""
     try:
+        # Use Render's PORT environment variable or default to 8000
+        if port is None:
+            port = int(os.environ.get('PORT', 8000))
+        
         # Change to the correct directory
         os.chdir(Path(__file__).parent)
         
         handler = CustomHTTPRequestHandler
         
         with socketserver.TCPServer(("", port), handler) as httpd:
-            print(f"\n🌐 Server started at: http://localhost:{port}")
+            print(f"\n🌐 Server started at: http://0.0.0.0:{port}")
             print("📱 Open this URL in your browser to start chatting!")
             print("\nPress Ctrl+C to stop the server.\n")
             

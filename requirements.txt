@@ -1,2 +1,2 @@
 # No external Python dependencies required
-# The application uses only Python standard library
+# The server uses only Python standard library modules
