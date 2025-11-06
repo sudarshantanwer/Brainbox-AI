@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browser Compatibility Checker</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .status {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .warning { color: #ffc107; }
+        .info { color: #17a2b8; }
+        .recommendation {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .download-links {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .download-btn {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+        }
+        .download-btn:hover {
+            background: #0056b3;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Browser Compatibility Checker</h1>
+    
+    <div class="card">
+        <h2>Your Browser Information</h2>
+        <div id="browserInfo"></div>
+    </div>
+
+    <div class="card">
+        <h2>WebAssembly Support Check</h2>
+        <div id="wasmStatus"></div>
+    </div>
+
+    <div class="card">
+        <h2>Required Features</h2>
+        <div id="featureCheck"></div>
+    </div>
+
+    <div class="card" id="recommendations" style="display: none;">
+        <h2>📋 Recommendations</h2>
+        <div id="recommendationContent"></div>
+    </div>
+
+    <div class="card">
+        <h2>🔧 Solutions to Try</h2>
+        
+        <h3>Option 1: Update Your Browser</h3>
+        <div class="recommendation">
+            <p><strong>Recommended:</strong> Use the latest version of these browsers:</p>
+            <div class="download-links">
+                <a href="https://www.google.com/chrome/" class="download-btn" target="_blank">📥 Chrome (Recommended)</a>
+                <a href="https://www.mozilla.org/firefox/" class="download-btn" target="_blank">📥 Firefox</a>
+                <a href="https://www.microsoft.com/edge" class="download-btn" target="_blank">📥 Edge</a>
+            </div>
+        </div>
+
+        <h3>Option 2: Enable WebAssembly (if disabled)</h3>
+        <div class="recommendation">
+            <p><strong>Chrome/Edge:</strong></p>
+            <ol>
+                <li>Type <code>chrome://flags/</code> in address bar</li>
+                <li>Search for "WebAssembly"</li>
+                <li>Make sure it's "Enabled"</li>
+                <li>Restart browser</li>
+            </ol>
+            
+            <p><strong>Firefox:</strong></p>
+            <ol>
+                <li>Type <code>about:config</code> in address bar</li>
+                <li>Search for <code>javascript.options.wasm</code></li>
+                <li>Make sure it's <code>true</code></li>
+                <li>Restart browser</li>
+            </ol>
+        </div>
+
+        <h3>Option 3: Check Security Settings</h3>
+        <div class="recommendation">
+            <p>Some enterprise or security software might block WebAssembly:</p>
+            <ul>
+                <li>Disable browser extensions temporarily</li>
+                <li>Check if you're on a corporate network with restrictions</li>
+                <li>Try incognito/private browsing mode</li>
+                <li>Temporarily disable antivirus browser protection</li>
+            </ul>
+        </div>
+
+        <h3>Option 4: Alternative Browsers to Try</h3>
+        <div class="recommendation">
+            <p>If your main browser doesn't work, try these in order:</p>
+            <ol>
+                <li><strong>Google Chrome</strong> - Best WebAssembly support</li>
+                <li><strong>Mozilla Firefox</strong> - Excellent compatibility</li>
+                <li><strong>Microsoft Edge</strong> - Good for Windows users</li>
+                <li><strong>Safari</strong> - For Mac users (version 11+)</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function checkBrowserCompatibility() {
+            // Get browser info
+            const userAgent = navigator.userAgent;
+            let browserName = 'Unknown';
+            let browserVersion = 'Unknown';
+            
+            if (userAgent.includes('Chrome') && !userAgent.includes('Edge')) {
+                browserName = 'Chrome';
+                browserVersion = userAgent.match(/Chrome\/(\d+)/)?.[1] || 'Unknown';
+            } else if (userAgent.includes('Firefox')) {
+                browserName = 'Firefox';
+                browserVersion = userAgent.match(/Firefox\/(\d+)/)?.[1] || 'Unknown';
+            } else if (userAgent.includes('Safari') && !userAgent.includes('Chrome')) {
+                browserName = 'Safari';
+                browserVersion = userAgent.match(/Version\/(\d+)/)?.[1] || 'Unknown';
+            } else if (userAgent.includes('Edge')) {
+                browserName = 'Edge';
+                browserVersion = userAgent.match(/Edge\/(\d+)/)?.[1] || 'Unknown';
+            } else if (userAgent.includes('Edg')) {
+                browserName = 'Edge (Chromium)';
+                browserVersion = userAgent.match(/Edg\/(\d+)/)?.[1] || 'Unknown';
+            }
+
+            document.getElementById('browserInfo').innerHTML = `
+                <div class="info status">Browser: ${browserName}</div>
+                <div class="info status">Version: ${browserVersion}</div>
+                <div class="info status">User Agent: <code>${userAgent}</code></div>
+                <div class="info status">Platform: ${navigator.platform}</div>
+            `;
+
+            // Check WebAssembly
+            const wasmSupported = typeof WebAssembly !== 'undefined';
+            let wasmDetails = '';
+            
+            if (wasmSupported) {
+                try {
+                    // Test instantiation
+                    const wasmCode = new Uint8Array([
+                        0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00
+                    ]);
+                    new WebAssembly.Module(wasmCode);
+                    wasmDetails = '<div class="success status">✅ WebAssembly is supported and working!</div>';
+                } catch (e) {
+                    wasmDetails = '<div class="error status">❌ WebAssembly detected but instantiation failed</div>';
+                    wasmDetails += `<div class="error">Error: ${e.message}</div>`;
+                }
+            } else {
+                wasmDetails = '<div class="error status">❌ WebAssembly is not supported</div>';
+            }
+
+            document.getElementById('wasmStatus').innerHTML = wasmDetails;
+
+            // Check other features
+            const features = {
+                'SharedArrayBuffer': typeof SharedArrayBuffer !== 'undefined',
+                'Worker': typeof Worker !== 'undefined',
+                'Promise': typeof Promise !== 'undefined',
+                'Fetch API': typeof fetch !== 'undefined',
+                'ES6 Modules': typeof Symbol !== 'undefined'
+            };
+
+            let featureHtml = '';
+            for (const [feature, supported] of Object.entries(features)) {
+                const status = supported ? 'success' : 'error';
+                const icon = supported ? '✅' : '❌';
+                featureHtml += `<div class="${status} status">${icon} ${feature}</div>`;
+            }
+
+            document.getElementById('featureCheck').innerHTML = featureHtml;
+
+            // Show recommendations
+            if (!wasmSupported) {
+                const recommendations = document.getElementById('recommendations');
+                const content = document.getElementById('recommendationContent');
+                
+                let recommendationText = '';
+                
+                if (browserName === 'Chrome' && parseInt(browserVersion) < 57) {
+                    recommendationText = '🔄 Your Chrome version is too old. WebAssembly requires Chrome 57+. Please update Chrome.';
+                } else if (browserName === 'Firefox' && parseInt(browserVersion) < 52) {
+                    recommendationText = '🔄 Your Firefox version is too old. WebAssembly requires Firefox 52+. Please update Firefox.';
+                } else if (browserName === 'Safari' && parseInt(browserVersion) < 11) {
+                    recommendationText = '🔄 Your Safari version is too old. WebAssembly requires Safari 11+. Please update Safari.';
+                } else if (browserName === 'Edge' && parseInt(browserVersion) < 16) {
+                    recommendationText = '🔄 Your Edge version is too old. WebAssembly requires Edge 16+. Please update Edge.';
+                } else if (browserName === 'Unknown') {
+                    recommendationText = '❓ Your browser is not recognized. Please try Chrome, Firefox, Edge, or Safari.';
+                } else {
+                    recommendationText = '⚙️ WebAssembly might be disabled in your browser settings. Check the solutions below.';
+                }
+                
+                content.innerHTML = `<div class="warning status">${recommendationText}</div>`;
+                recommendations.style.display = 'block';
+            }
+        }
+
+        // Run the check when page loads
+        checkBrowserCompatibility();
+    </script>
+</body>
+</html>

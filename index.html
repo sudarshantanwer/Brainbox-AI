@@ -194,11 +194,21 @@
     </div>
 
     <div class="loading" id="loading">
-        <div>Loading Phi-1.5 Model...</div>
+        <div>Checking Browser Compatibility...</div>
         <div class="progress-bar">
             <div class="progress-fill" id="progressFill"></div>
         </div>
-        <div id="loadingText">Preparing model files...</div>
+        <div id="loadingText">Preparing browser compatibility check...</div>
+        
+        <!-- Debug buttons -->
+        <div style="margin-top: 20px;">
+            <button onclick="manualWebAssemblyTest()" style="padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                🔧 Manual WebAssembly Test
+            </button>
+            <button onclick="openBrowserChecker()" style="padding: 10px 20px; margin: 5px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                🔍 Open Browser Checker
+            </button>
+        </div>
     </div>
 
     <div class="chat-container" id="chatContainer" style="display: none;">
@@ -222,7 +232,31 @@
         </div>
     </div>
 
-    <script src="https://unpkg.com/@mlc-ai/web-llm/dist/index.js"></script>
+    <!-- Load WebLLM as ES module -->
+    <script type="module">
+        try {
+            console.log('Loading WebLLM as ES module...');
+            const webllmModule = await import('./lib/web-llm.js');
+            
+            // Make webllm available globally
+            window.webllm = webllmModule;
+            console.log('✅ WebLLM loaded successfully as ES module');
+            console.log('Available exports:', Object.keys(webllmModule));
+            
+        } catch (error) {
+            console.error('❌ Failed to load WebLLM as ES module:', error);
+            
+            // Fallback to CDN
+            try {
+                console.log('Trying CDN fallback...');
+                const webllmCDN = await import('https://unpkg.com/@mlc-ai/web-llm@0.2.79/lib/index.js');
+                window.webllm = webllmCDN;
+                console.log('✅ WebLLM loaded from CDN');
+            } catch (cdnError) {
+                console.error('❌ CDN fallback also failed:', cdnError);
+            }
+        }
+    </script>
     <script src="app.js"></script>
 </body>
 </html>
