@@ -1,9 +1,9 @@
-WebLLM Supported Models (no manual download required):
-==================================================
+WebLLM Supported Models:
+========================================
 
+- TinyLlama-1.1B-Chat-v0.4-q4f16_1-MLC
+- Phi-3-mini-4k-instruct-q4f16_1-MLC
 - Llama-2-7b-chat-hf-q4f16_1-MLC
 - RedPajama-INCITE-Chat-3B-v1-q4f16_1-MLC
-- vicuna-v1-7b-q4f16_1-MLC
-- Llama-2-13b-chat-hf-q4f16_1-MLC
 
-These models will be automatically downloaded by WebLLM when first used.
+Models are downloaded automatically by WebLLM when first used.
