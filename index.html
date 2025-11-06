@@ -232,31 +232,90 @@
         </div>
     </div>
 
-    <!-- Load WebLLM as ES module -->
+    <!-- Load WebLLM with better compatibility -->
+    <script>
+        // Missing functions for debug buttons
+        window.manualWebAssemblyTest = function() {
+            console.log('🔧 Testing WebAssembly support...');
+            if (typeof WebAssembly === 'object' && typeof WebAssembly.instantiate === 'function') {
+                console.log('✅ WebAssembly is supported');
+                alert('✅ WebAssembly is supported in your browser!');
+            } else {
+                console.log('❌ WebAssembly is not supported');
+                alert('❌ WebAssembly is not supported in your browser.');
+            }
+        };
+
+        window.openBrowserChecker = function() {
+            console.log('🔍 Opening browser checker...');
+            window.open('./browser-check.html', '_blank');
+        };
+    </script>
+
+    <!-- Try to load WebLLM from CDN first -->
     <script type="module">
-        try {
-            console.log('Loading WebLLM as ES module...');
-            const webllmModule = await import('./lib/web-llm.js');
-            
-            // Make webllm available globally
-            window.webllm = webllmModule;
-            console.log('✅ WebLLM loaded successfully as ES module');
-            console.log('Available exports:', Object.keys(webllmModule));
-            
-        } catch (error) {
-            console.error('❌ Failed to load WebLLM as ES module:', error);
-            
-            // Fallback to CDN
+        let webllmLoaded = false;
+        
+        // Function to load WebLLM from CDN
+        async function loadWebLLMFromCDN() {
             try {
-                console.log('Trying CDN fallback...');
+                console.log('Loading WebLLM from CDN...');
                 const webllmCDN = await import('https://unpkg.com/@mlc-ai/web-llm@0.2.79/lib/index.js');
                 window.webllm = webllmCDN;
+                webllmLoaded = true;
                 console.log('✅ WebLLM loaded from CDN');
+                console.log('Available exports:', Object.keys(webllmCDN));
+                return true;
             } catch (cdnError) {
-                console.error('❌ CDN fallback also failed:', cdnError);
+                console.error('❌ CDN loading failed:', cdnError);
+                return false;
             }
         }
+
+        // Function to load local WebLLM files
+        function loadWebLLMLocal() {
+            return new Promise((resolve, reject) => {
+                console.log('Trying to load local WebLLM...');
+                const script = document.createElement('script');
+                script.src = './lib/webllm-global.js';
+                script.onload = () => {
+                    if (window.webllm) {
+                        console.log('✅ Local WebLLM loaded');
+                        webllmLoaded = true;
+                        resolve(true);
+                    } else {
+                        reject(new Error('WebLLM not found in global scope'));
+                    }
+                };
+                script.onerror = () => {
+                    reject(new Error('Failed to load local WebLLM script'));
+                };
+                document.head.appendChild(script);
+            });
+        }
+
+        // Try to load WebLLM
+        try {
+            // First try CDN (more reliable)
+            const cdnSuccess = await loadWebLLMFromCDN();
+            
+            if (!cdnSuccess) {
+                // Fallback to local files
+                try {
+                    await loadWebLLMLocal();
+                } catch (localError) {
+                    console.error('❌ All WebLLM loading methods failed');
+                    const status = document.getElementById('status');
+                    if (status) {
+                        status.textContent = '❌ Failed to load WebLLM. Please check your internet connection and try refreshing.';
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('❌ WebLLM loading error:', error);
+        }
     </script>
+    
     <script src="app.js"></script>
 </body>
 </html>

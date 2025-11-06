@@ -79,9 +79,13 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')
         
-        # Add headers for WebLLM
+        # Add headers for WebLLM and WebAssembly
         self.send_header('Cross-Origin-Opener-Policy', 'same-origin')
         self.send_header('Cross-Origin-Embedder-Policy', 'require-corp')
+        
+        # Add cache control for static assets
+        if any(ext in self.path for ext in ['.js', '.wasm', '.bin']):
+            self.send_header('Cache-Control', 'public, max-age=3600')
         
         super().end_headers()
     
@@ -95,13 +99,17 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         else:
             mime_type, encoding = result, None
         
-        # Custom MIME types for model files
+        # Custom MIME types for model files and JavaScript modules
         if path.endswith('.bin'):
             return 'application/octet-stream', encoding
         elif path.endswith('.json'):
             return 'application/json', encoding
         elif path.endswith('.js'):
             return 'application/javascript', encoding
+        elif path.endswith('.mjs'):
+            return 'application/javascript', encoding
+        elif path.endswith('.wasm'):
+            return 'application/wasm', encoding
         
         return mime_type, encoding
     
