@@ -2,7 +2,7 @@
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
 
-A fully offline AI chat application that runs entirely in your browser using WebLLM. No server-side processing, no API keys required, and complete privacy - all AI inference happens locally on your device.
+A fully offline Small Language Model AI chat application that runs entirely in your browser using WebLLM. No server-side processing, no API keys required, and complete privacy - all AI inference happens locally on your device.
 
 ## 🌟 Features
 
